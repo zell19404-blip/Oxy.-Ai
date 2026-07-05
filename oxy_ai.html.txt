@@ -1,0 +1,112 @@
+import streamlit as st
+import time
+
+
+# --- KONFIGURASI HALAMAN ---
+st.set_page_config(page_title="oxy. Ai - Smart Assistant", page_icon="🤖", layout="centered")
+
+
+# --- STYLE CSS AGAR KEREN ---
+st.markdown("""
+    <style>
+    .main { background-color: #0f1116; }
+    .stTextInput>div>div>input { border-radius: 15px; }
+    .stButton>button { border-radius: 15px; background-color: #6c5ce7; color: white; font-weight: bold; }
+    .creator-info { font-size: 14px; color: #a29bfe; text-align: center; margin-bottom: 20px; }
+    .result-box { padding: 20px; border-radius: 15px; background-color: #1e1e2f; border: 1px solid #6c5ce7; }
+    </style>
+    """, unsafe_allow_index=True)
+
+
+# --- SIDEBAR & NAVIGASI ---
+with st.sidebar:
+    st.title("🚀 Menu oxy. Ai")
+    st.markdown("---")
+    fitur = st.selectbox("Pilih Fitur:", [
+        "💬 Chat & Belajar", 
+        "🧮 Kalkulator Pintar", 
+        "🌐 Penerjemah Bahasa",
+        "📚 Rangkum Materi"
+    ])
+    st.markdown("---")
+    st.markdown("<p class='creator-info'>Diciptakan oleh:<br><b>Fazela Alya Saputri</b></p>", unsafe_allow_index=True)
+
+
+# --- HEADER ---
+st.title("🤖 oxy. Ai")
+st.caption(f"Mode Aktif: {fitur}")
+
+
+# --- LOGIKA FITUR 1: CHAT & BELAJAR ---
+if fitur == "💬 Chat & Belajar":
+    if "messages" not in st.session_state:
+        st.session_state.messages = [{"role": "assistant", "content": "Halo Fazela! Saya oxy. Ai. Mau belajar apa hari ini?"}]
+
+
+    for message in st.session_state.messages:
+        with st.chat_message(message["role"]):
+            st.markdown(message["content"])
+
+
+    if prompt := st.chat_input("Tanyakan soal pelajaran atau apa saja..."):
+        st.session_state.messages.append({"role": "user", "content": prompt})
+        with st.chat_message("user"):
+            st.markdown(prompt)
+
+
+        with st.chat_message("assistant"):
+            response = f"Sebagai oxy. Ai ciptaan Fazela, saya akan membantu Anda. Mengenai '{prompt}', jawaban singkatnya adalah: [Penjelasan AI akan muncul di sini]. Apakah ada bagian yang ingin diperjelas?"
+            st.markdown(response)
+            st.session_state.messages.append({"role": "assistant", "content": response})
+
+
+# --- LOGIKA FITUR 2: KALKULATOR ---
+elif fitur == "🧮 Kalkulator Pintar":
+    st.subheader("Kalkulator Matematika")
+    col1, col2 = st.columns(2)
+    with col1:
+        num1 = st.number_input("Angka Pertama", value=0.0)
+    with col2:
+        num2 = st.number_input("Angka Kedua", value=0.0)
+    
+    operasi = st.selectbox("Pilih Operasi", ["Tambah (+)", "Kurang (-)", "Kali (×)", "Bagi (÷)"])
+    
+    if st.button("Hitung Sekarang"):
+        if operasi == "Tambah (+)": hasil = num1 + num2
+        elif operasi == "Kurang (-)": hasil = num1 - num2
+        elif operasi == "Kali (×)": hasil = num1 * num2
+        elif operasi == "Bagi (÷)": hasil = num1 / num2 if num2 != 0 else "Error (Bagi 0)"
+        
+        st.markdown(f"<div class='result-box'><h3>Hasil: {hasil}</h3></div>", unsafe_allow_index=True)
+        st.success("oxy. Ai telah menyelesaikan hitunganmu!")
+
+
+# --- LOGIKA FITUR 3: PENERJEMAH ---
+elif fitur == "🌐 Penerjemah Bahasa":
+    st.subheader("Penerjemah Bahasa oxy. Ai")
+    text_to_translate = st.text_area("Masukkan teks yang ingin diterjemahkan:")
+    target_lang = st.selectbox("Pilih Bahasa Tujuan:", ["Inggris", "Indonesia", "Jepang", "Korea", "Arab"])
+    
+    if st.button("Terjemahkan"):
+        if text_to_translate:
+            # Simulasi Terjemahan
+            st.info(f"Hasil Terjemahan ke {target_lang}:")
+            st.write(f"Teks: '{text_to_translate}' telah berhasil diterjemahkan oleh oxy. Ai.")
+        else:
+            st.warning("Masukkan teks dulu ya, Fazela!")
+
+
+# --- LOGIKA FITUR 4: RANGKUM ---
+elif fitur == "📚 Rangkum Materi":
+    st.subheader("Rangkum Materi Belajar")
+    materi = st.text_area("Tempel teks materi yang panjang di sini:", height=200)
+    if st.button("Buat Rangkuman"):
+        if materi:
+            with st.spinner("oxy. Ai sedang membaca..."):
+                time.sleep(2)
+                st.markdown("### ✨ Rangkuman Penting:")
+                st.write("- Poin Utama 1: [Inti materi]")
+                st.write("- Poin Utama 2: [Detail penting]")
+                st.write("- Kesimpulan: [Sangat mudah dipahami]")
+        else:
+            st.error("Mana teksnya? Jangan lupa diisi ya!")
